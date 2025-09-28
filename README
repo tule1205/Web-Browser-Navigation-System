@@ -1,0 +1,101 @@
+- The goal of this project is to write your own Stack and Queue ADT using your own array list and linked list
+implementation that extends the iterable interface.
+- Implement a Web Browser Navigation System that mimics real-life browsing experiences. This system will allow
+users to visit websites, move backward and forward in their browsing history, and restore their last session
+when reopening the browser.
+
+Name : Tu Le
+NetID: TNL220001
+Section : CS3345.002
+Date : September 27 2025
+
+1. Implementation Choices:
+
+- The Web Browser Navigation System uses two custom data structures: a Doubly Linked List for the Stack and a Circular
+Array for the Queue. This follows the project requirements and provides efficient operation performance.
+
+    A. BrowserLinkedList (Doubly Linked List)
+    - Role: Link with BrowserStack
+    - Key Design Choice: Implemented with head and tail nodes
+    - Function: Head and tail nodes eliminate the need for null checks at the beginning and end of the list,
+    supporting for insertion and removal method. Since stack operations (push/pop) are defined as
+    inserting/removing at the front of the list, this ensures O(1) performance for history updates.
+
+    B. BrowserArrayList (Circular Array)
+    - Role: Link with BrowserQueue
+    - Key Design Choice: Implemented as a Circular Array using modular arithmetic.
+    - Function: Queues require O(1) insertion at the back. Insertion is implemented by:
+           - Using modular arithmetic ((front + size) % capacity) to calculate the back position for addLast()
+           (enqueue).
+
+    C. BrowserStack and BrowserQueue
+    - These wrapper classes expose the necessary Stack and Queue ADT methods while using the data structure's efficient
+     O(1) methods.
+
+    D. Session Management (closeBrowser() and restoreLastSession())
+    - Required Algorithm: The assignment requires the use of the custom StackIterator to save state.
+    - Implementation: closeBrowser() and a PrintWriter save the state to a text file (session_data.txt). The enhanced
+    for loop (for (String url: backStack)) calls the StackIterator in the right order (Top-to-Bottom) for session
+    saving. The method restoreLastSession() reads the content file with a Scanner and reconstructs the stacks and
+    queue in the correct order.
+
+2. Test cases:
+
+visitWebsite() -----> Visit A, B, C -----> A & B is in backStack, C is current, ForwardStack is empty.
+                                          - BONUS part: When C is entered correctly (URL), it will be opened in the
+                                            default browser.
+goBack() ----> From C, press 2 (Back) ----> Current page is B, C moves to forwardStack.
+goForward() ----> From B, press 3 (Forward) ----> Current page is C, B moves back to backStack.
+Edge Case ----> Repeatedly press Back/Forward on empty stacks ----> Returns "No page available" message, does not
+                                                                    push the current page repeatedly.
+History Invalidation ----> Go back (A <- B) then visit new page X ----> Current: X, backStack: [B, A], forwardStack:
+                                                                        empty (Cleared via forwardStack.clear()).
+History Queue ----> Show history after A, B, C ----> Displays A, B, C in the order they were visited.
+Session Save ----> Save state and close (press 6) ----> session_data.txt is created with current page, stacks, and
+                                                        queue.
+Session Restore ----> Run program, restore session (press 7) ----> Last session is fully restored, allowing
+                                                                   using last browser.
+
+3. Time Complexity Analysis:
+
+BrowserLinkedList Operations (Stack Push/Pop): O(1)
+
+    - insert() (Stack Push): Fixed number of pointer updates at the head.
+
+    - remove() (Stack Pop): Fixed number of pointer updates at the head.
+
+BrowserArrayList Operations (Queue Enqueue/Dequeue):
+
+    - addLast() (Enqueue): O(1). Direct update of rear index via modular arithmetic.
+
+    - resize(): O(N). Requires iterating and copying N elements to a new array.
+
+BrowserStack / BrowserQueue Operations:
+
+    - push(), pop(): O(1). Delegates to O(1) linked list operations.
+
+    - enqueue(): O(1). Delegates to O(1) array operations.
+
+BrowserNavigation Operations:
+
+    - visitWebsite(): O(1). Fixed number of O(1) stack/queue operations and an O(1) forwardStack.clear().
+
+    - goBack(), goForward(): O(1). Fixed number of stack push/pop operations.
+
+    - showHistory(): O(N). Must iterate over all N elements in the queue.
+
+    - closeBrowser(): O(N). Must iterate over all N total elements to write them to the text file.
+
+    - restoreLastSession(): O(N). Must iterate over all N lines in the text file to reconstruct data structures.
+
+4. Performance Enhancement (Fixing Logic)
+
+Problem:
+    - goBack() and goForward() methods pushed the current page to the stack before determining whether the
+    destination stack was empty. When navigation failed, the current page was repeated.
+
+Solution:
+    - The logic was fixed by including (isEmpty()) as a check. Only successful navigation results in a page being
+    pushed to the stack. Control flow prevents redundant O(1) stack operations from mistakenly polluting the history
+    state, improving system performance.
+
