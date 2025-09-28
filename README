@@ -5,8 +5,6 @@ users to visit websites, move backward and forward in their browsing history, an
 when reopening the browser.
 
 Name : Tu Le
-NetID: TNL220001
-Section : CS3345.002
 Date : September 27 2025
 
 1. Implementation Choices:
@@ -98,4 +96,5 @@ Solution:
     - The logic was fixed by including (isEmpty()) as a check. Only successful navigation results in a page being
     pushed to the stack. Control flow prevents redundant O(1) stack operations from mistakenly polluting the history
     state, improving system performance.
+
 
